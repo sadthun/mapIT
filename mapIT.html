@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Map of Italy</title>
+  <style>
+    /* General styles for the map */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Map container: centered and responsive */
+    #map-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      min-height: 100vh;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Map settings, contained in an iframe or object */
+    #map {
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      /* Maintain a constant aspect ratio if desired */
+      aspect-ratio: 3 / 2;
+    }
+
+    /* Box to display the selected region */
+    #selected-region-box {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #f0f0f0;
+      border-left: 5px solid #007700;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #333;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      height: 150px;  /* Box height */
+      width: 250px;   /* Box width */
+      margin-top: 15rem;
+      margin-left: 45rem;
+    }
+
+    /* Style for the selected region name */
+    #selected-region-name {
+      font-weight: bold;
+      color: darkgreen;
+      font-size: 1.3rem;
+    }
+
+    /* Style for optional additional search text */
+    #search-text {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    /* Style for the "Search" button */
+    #search-button {
+      margin-top: 20px;
+      padding: 0.5rem 1rem;
+      background-color: #007700;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #search-button:hover {
+      background-color: #005500;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main map container -->
+  <div id="map">
+    <!-- SVG object: use a relative path if the file is in public/img -->
+    <object type="image/svg+xml" data="/img/it.svg" id="mappaItalia"></object>
+  </div>
+
+  <!-- Box for selected region display -->
+  <div id="selected-region-box">
+    Selected region: <span id="selected-region-name">none</span>
+    <button id="search-button">Search</button> <!-- Button to trigger the action -->
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Map object: association between SVG IDs and region names
+      const regionNames = {
+        IT21: "Piemonte",
+        IT23: "Valle d'Aosta",
+        IT25: "Lombardia",
+        IT32: "Trentino-Alto Adige",
+        IT34: "Veneto",
+        IT36: "Friuli Venezia Giulia",
+        IT42: "Liguria",
+        IT45: "Emilia-Romagna",
+        IT52: "Toscana",
+        IT55: "Umbria",
+        IT57: "Marche",
+        IT62: "Lazio",
+        IT65: "Abruzzo",
+        IT67: "Molise",
+        IT72: "Campania",
+        IT75: "Puglia",
+        IT77: "Basilicata",
+        IT78: "Calabria",
+        IT82: "Sicilia",
+        IT88: "Sardegna"
+      };
+
+      const svgObject = document.getElementById("mappaItalia");
+      const selectedRegionName = document.getElementById("selected-region-name");
+      const searchButton = document.getElementById("search-button");
+
+      let selectedRegionId = null; // Variable to store the selected region ID
+
+      svgObject.addEventListener("load", function() {
+        const svgDoc = svgObject.contentDocument;
+        const regions = svgDoc.querySelectorAll("path");
+
+        // Add click event to each region
+        regions.forEach(region => {
+          const regionId = region.getAttribute("id");
+          const regionName = regionNames[regionId];
+
+          if (regionName) {
+            region.style.cursor = "pointer";
+
+            region.addEventListener("click", function() {
+              // Reset all region colors
+              regions.forEach(r => r.style.fill = "");
+              // Highlight the clicked region
+              region.style.fill = "darkgreen";
+              // Update the displayed region name
+              selectedRegionName.textContent = regionName;
+              // Store the selected region ID
+              selectedRegionId = regionId;
+            });
+          }
+        });
+      });
+
+      // Handle "Search" button click
+      searchButton.addEventListener("click", function() {
+        if (selectedRegionId) {
+          const regionName = regionNames[selectedRegionId];
+          if (regionName) {
+            // Redirect to the page dedicated to the selected region
+            window.location.href = `${regionName.toLowerCase()}.html`;
+          }
+        } else {
+          alert("Please select a region before searching.");
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
